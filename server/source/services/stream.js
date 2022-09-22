@@ -1,6 +1,7 @@
 import { request } from 'https'
 import { STREAM_SERVICE_DELAY } from '../lib/config'
 
+// This implementation is meant to enable pausing and resuming the download
 export default async function* streamLink(url) {
     const promisesQueue = []
     const enders = new Set(['end', 'error'])
