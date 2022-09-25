@@ -20,7 +20,9 @@
     "ioredis": "^4.27.8",
     "lodash": "^4.17.21",
     "node-fetch": "^2.6.1",
-    "torrent-stream": "^1.2.1"
+    "socket.io": "^4.5.2",
+    "torrent-stream": "^1.2.1",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",
