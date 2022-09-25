@@ -21,7 +21,7 @@ app.use("/api/v1", Auth, API_ROUTER_V1);
 
 app.get("/heartbeat", (_, res) => {
   const beat = { startUpTime };
-  console.log("I am alive");
+  console.log(new Date(), "I am alive");
   res.json(beat);
 });
 
