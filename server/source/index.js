@@ -4,7 +4,6 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import uuid from "uuid";
 
-import { connect } from "./lib/mongoose";
 import { SERVER_PORT, ENV } from "./lib/config";
 import API_ROUTER_V1 from "./routes/api_v1";
 import Auth from "./middlewares/Auth";
@@ -17,7 +16,7 @@ app.use(cors());
 app.use(express.json());
 app.use(ResponseBodyInterceptor);
 
-app.use("/api/v1", Auth, API_ROUTER_V1);
+app.use("/api/v1", API_ROUTER_V1);
 
 app.get("/heartbeat", (_, res) => {
   const beat = { startUpTime };
@@ -25,7 +24,7 @@ app.get("/heartbeat", (_, res) => {
   res.json(beat);
 });
 
-app.use(function (req, res, _, err) {
+app.use((req, res, next, err) => {
   if (!err) res.end();
   else {
     console.log("error:", err);
@@ -42,10 +41,9 @@ app.use(function (req, res, _, err) {
 const httpServer = createServer(app);
 const io = new Server(httpServer, { path: "/ws" });
 
-io.main();
+main();
 
 async function main() {
-  await connect();
   httpServer.listen(SERVER_PORT, () =>
     console.log(`Server in "${ENV}" mode & listening on ${SERVER_PORT}!`)
   );

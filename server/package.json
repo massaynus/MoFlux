@@ -4,7 +4,7 @@
   "description": "",
   "main": "source/index.js",
   "scripts": {
-    "start": "npx babel-node source/index.js",
+    "start": "npx nodemon --exec babel-node source/index.js",
     "build": "npx babel ./source --out-dir ./dist --source-maps --copy-files --compact auto --no-comments --verbose --delete-dir-on-start",
     "deploy": "npm run build && node dist/index.js"
   },
