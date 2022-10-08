@@ -7,7 +7,14 @@ import {
   isUsernameInRoom,
 } from "../services/roomService";
 
-const events = ["seek", "changeSource", "pause", "play", "transferOwnership"];
+const events = [
+  "seek",
+  "changeSource",
+  "pause",
+  "play",
+  "transferOwnership",
+  "timeUpdate",
+];
 
 /**
  * configure Socker.io server
