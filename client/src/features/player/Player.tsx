@@ -8,13 +8,15 @@ import {
   selectRoomOwner,
   selectUsername,
   selectRoom,
+  setSource,
 } from "./playerSlice";
-import { SyntheticEvent, useEffect, useRef } from "react";
+import { SyntheticEvent, useEffect, useRef, useState } from "react";
 import { usePlayerControlSocket } from "../../hooks/usePlayerControlSocket";
 
 export function Player() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const dispatch = useAppDispatch();
+  const [sourceInputEnabled, setSourceUpdateEnabled] = useState(false);
 
   const source = useAppSelector(selectSource);
   const currentTime = useAppSelector(selectCurrentTime);
@@ -52,6 +54,16 @@ export function Player() {
       <h1>Room: {room}</h1>
       <h1>Room owner: {roomOwner}</h1>
       <h1>Playback state: {playbackState}</h1>
+      <div className="sourceInput">
+        <label htmlFor="sourceInput">Source:</label>
+        <input
+          type="text"
+          name="sourceInput"
+          value={source}
+          onDoubleClick={() => setSourceUpdateEnabled((b) => !b)}
+          onChange={(e) => dispatch(setSource(e.target.value))}
+        />
+      </div>
       <video
         autoPlay
         controls
