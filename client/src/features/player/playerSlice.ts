@@ -4,6 +4,8 @@ import { RootState } from "../../app/store";
 export type PlayerPlaycbackState = "unstarted" | "started" | "paused";
 
 export interface PlayerState {
+  room: string;
+  username: string;
   source?: string;
   currentTime: number;
   duration: number;
@@ -11,11 +13,13 @@ export interface PlayerState {
 }
 
 const initialState: PlayerState = {
+  room: "room01",
+  username: "user_" + Date.now(),
   currentTime: 0,
   duration: 0,
   playbackState: "unstarted",
   source:
-    "http://localhost:8080/%5bEgyBest%5d.The.Take.2016.HDRip.1080p.x264.mp4",
+    "http://192.168.11.101:8080/%5bEgyBest%5d.The.Take.2016.HDRip.1080p.x264.mp4",
 };
 
 export const playerSlice = createSlice({
@@ -36,11 +40,26 @@ export const playerSlice = createSlice({
     setPlaybackState: (state, action: PayloadAction<PlayerPlaycbackState>) => {
       state.playbackState = action.payload;
     },
+    setUsername: (state, action: PayloadAction<string>) => {
+      state.username = action.payload;
+    },
+    setRoom: (state, action: PayloadAction<string>) => {
+      state.room = action.payload;
+    },
   },
 });
 
-export const { setSource, setCurrentTime, setDuration, setPlaybackState } =
-  playerSlice.actions;
+export const {
+  setSource,
+  setCurrentTime,
+  setDuration,
+  setPlaybackState,
+  setUsername,
+  setRoom,
+} = playerSlice.actions;
+
+export const selectUsername = (state: RootState) => state.player.username;
+export const selectRoom = (state: RootState) => state.player.room;
 
 export const selectSource = (state: RootState) => state.player.source;
 export const selectCurrentTime = (state: RootState) => state.player.currentTime;

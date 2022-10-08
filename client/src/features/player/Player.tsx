@@ -1,41 +1,60 @@
 import styles from "./Player.module.scss";
-import { useAppSelector, useAppDispatch } from "../../app/hooks";
+import { useAppSelector } from "../../app/hooks";
 import {
-  setCurrentTime,
   selectCurrentTime,
   selectSource,
-  selectDuration,
-  setDuration,
+  selectPlaybackState,
 } from "./playerSlice";
-import { SyntheticEvent, useRef } from "react";
+import { SyntheticEvent, useEffect, useRef } from "react";
+import { usePlayerControlSocket } from "../../hooks/usePlayerControlSocket";
 
 export function Player() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const dispatch = useAppDispatch();
 
   const source = useAppSelector(selectSource);
   const currentTime = useAppSelector(selectCurrentTime);
-  const duration = useAppSelector(selectDuration);
+  const playbackState = useAppSelector(selectPlaybackState);
+
+  const socketControls = usePlayerControlSocket();
+
+  useEffect(() => {
+    const target = videoRef.current;
+    if (target === null) return;
+
+    if (playbackState === "started") target.play();
+    else target.pause();
+  }, [playbackState]);
+
+  useEffect(() => {
+    const target = videoRef.current;
+
+    if (target !== null) target.currentTime = currentTime;
+  }, [currentTime]);
 
   const onTimeUpdateHandler = (e: SyntheticEvent<HTMLVideoElement, Event>) => {
     const target = videoRef.current || e.currentTarget;
-
-    const currentTime = target.currentTime;
-    const duration = target.duration;
-
-    dispatch(setDuration(duration));
-    dispatch(setCurrentTime(currentTime));
+    const time = target.currentTime;
+    socketControls.seek(time);
   };
 
   return (
-    <div className="videoWrapper">
+    <div className={styles.videoWrapper}>
       <video
-        className="videoPlayer"
+        autoPlay
+        controls
+        className={styles.videoPlayer}
         ref={videoRef}
         src={source}
         onTimeUpdate={onTimeUpdateHandler}
-        autoPlay
-        controls
+        onSeeked={() => {
+          socketControls.seek(videoRef.current?.currentTime || 0);
+        }}
+        onPause={() => {
+          socketControls.pause();
+        }}
+        onPlay={() => {
+          socketControls.play();
+        }}
       />
     </div>
   );
