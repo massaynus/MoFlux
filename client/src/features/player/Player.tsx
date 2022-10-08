@@ -4,8 +4,10 @@ import {
   selectCurrentTime,
   selectSource,
   selectPlaybackState,
-  setCurrentTime,
   setPlaybackState,
+  selectRoomOwner,
+  selectUsername,
+  selectRoom,
 } from "./playerSlice";
 import { SyntheticEvent, useEffect, useRef } from "react";
 import { usePlayerControlSocket } from "../../hooks/usePlayerControlSocket";
@@ -17,6 +19,9 @@ export function Player() {
   const source = useAppSelector(selectSource);
   const currentTime = useAppSelector(selectCurrentTime);
   const playbackState = useAppSelector(selectPlaybackState);
+  const username = useAppSelector(selectUsername);
+  const room = useAppSelector(selectRoom);
+  const roomOwner = useAppSelector(selectRoomOwner);
 
   const socketControls = usePlayerControlSocket();
 
@@ -43,6 +48,9 @@ export function Player() {
 
   return (
     <div className={styles.videoWrapper}>
+      <h1>Username: {username}</h1>
+      <h1>Room: {room}</h1>
+      <h1>Room owner: {roomOwner}</h1>
       <h1>Playback state: {playbackState}</h1>
       <video
         autoPlay

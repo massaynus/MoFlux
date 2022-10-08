@@ -2,11 +2,13 @@ import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
 import {
+  selectIsRoomOwner,
   selectPlaybackState,
   selectRoom,
   selectUsername,
   setCurrentTime,
   setPlaybackState,
+  setRoomOwner,
   setSource,
 } from "../features/player/playerSlice";
 
@@ -27,6 +29,7 @@ export function usePlayerControlSocket() {
   const username = useAppSelector(selectUsername);
   const room = useAppSelector(selectRoom);
   const playbackState = useAppSelector(selectPlaybackState);
+  const isRoomOwner = useAppSelector(selectIsRoomOwner);
 
   useEffect(() => {
     socket.on("connect", () => setIsConnected(true));
@@ -41,7 +44,9 @@ export function usePlayerControlSocket() {
 
   useEffect(() => {
     socket.on("timeUpdate", (username, arg) => {
-      playbackState !== "started" && dispatch(setCurrentTime(parseInt(arg)));
+      playbackState !== "started" &&
+        isRoomOwner &&
+        dispatch(setCurrentTime(parseInt(arg)));
     });
 
     socket.on("seek", (username, arg) => {
@@ -55,12 +60,22 @@ export function usePlayerControlSocket() {
 
     socket.on("play", (username) => dispatch(setPlaybackState("started")));
 
-    socket.on("transferOwnership", (username, arg) => {});
+    socket.on("transferOwnership", (username, arg) => {
+      dispatch(setRoomOwner(arg));
+    });
+
+    socket.on("transferOwnership", (username, arg) => {
+      dispatch(setRoomOwner(arg));
+    });
+
+    socket.on("roomOwner", (username) => {
+      dispatch(setRoomOwner(username));
+    });
 
     return () => {
       events.map((event) => socket.off(event));
     };
-  }, [dispatch, playbackState, room, username]);
+  }, [dispatch, isRoomOwner, playbackState, room, username]);
 
   useEffect(() => {
     isConnected && socket.emit("credentials", username, room);

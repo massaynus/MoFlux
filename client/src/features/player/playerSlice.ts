@@ -6,6 +6,7 @@ export type PlayerPlaycbackState = "unstarted" | "started" | "paused";
 export interface PlayerState {
   room: string;
   username: string;
+  roomOwner?: string;
   source?: string;
   currentTime: number;
   duration: number;
@@ -14,7 +15,7 @@ export interface PlayerState {
 
 const initialState: PlayerState = {
   room: "room01",
-  username: "user_" + Date.now(),
+  username: "user_" + Math.floor(Math.random() * 1000),
   currentTime: 0,
   duration: 0,
   playbackState: "unstarted",
@@ -46,6 +47,9 @@ export const playerSlice = createSlice({
     setRoom: (state, action: PayloadAction<string>) => {
       state.room = action.payload;
     },
+    setRoomOwner: (state, action: PayloadAction<string>) => {
+      state.roomOwner = action.payload;
+    },
   },
 });
 
@@ -56,9 +60,13 @@ export const {
   setPlaybackState,
   setUsername,
   setRoom,
+  setRoomOwner,
 } = playerSlice.actions;
 
 export const selectUsername = (state: RootState) => state.player.username;
+export const selectRoomOwner = (state: RootState) => state.player.roomOwner;
+export const selectIsRoomOwner = (state: RootState) =>
+  state.player.roomOwner === selectUsername(state);
 export const selectRoom = (state: RootState) => state.player.room;
 
 export const selectSource = (state: RootState) => state.player.source;
