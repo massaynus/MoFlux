@@ -6,6 +6,7 @@ import uuid from "uuid";
 
 import { SERVER_PORT, ENV } from "./lib/config";
 import API_ROUTER_V1 from "./routes/api_v1";
+import WS_ROUTER_V1 from "./routes/ws_v1";
 import Auth from "./middlewares/Auth";
 import ResponseBodyInterceptor from "./middlewares/ResponseBodyInterceptor";
 
@@ -39,7 +40,14 @@ app.use((req, res, next, err) => {
 });
 
 const httpServer = createServer(app);
-const io = new Server(httpServer, { path: "/ws" });
+const io = new Server(httpServer, {
+  path: "/ws",
+  cors: {
+    origin: "*",
+  },
+});
+
+WS_ROUTER_V1(io);
 
 main();
 

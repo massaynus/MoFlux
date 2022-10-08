@@ -2,7 +2,8 @@ export const roomsOwners = {};
 export const roomMembers = {};
 
 export function isRoomOwner(username, room) {
-  return roomsOwners[room] === username;
+  const owner = roomsOwners[room];
+  return owner === username;
 }
 
 export function connectToRoom(username, room) {
@@ -10,6 +11,22 @@ export function connectToRoom(username, room) {
   if (!roomMembers[room]) roomMembers[room] = new Set();
 
   roomMembers[room].add(username);
+}
+
+export function getRoomOwner(room) {
+  return roomsOwners[room];
+}
+
+export function disconnectFromRoom(username, room) {
+  roomMembers[room].delete(username);
+
+  if (isRoomOwner(username, room)) {
+    const nextUser = Array.from(roomMembers[room]).shift();
+    transferRoomOwnership(nextUser, room);
+    return nextUser;
+  }
+
+  return null;
 }
 
 export function isUsernameInRoom(username, room) {
