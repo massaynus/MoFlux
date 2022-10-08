@@ -1,15 +1,18 @@
 import styles from "./Player.module.scss";
-import { useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   selectCurrentTime,
   selectSource,
   selectPlaybackState,
+  setCurrentTime,
+  setPlaybackState,
 } from "./playerSlice";
 import { SyntheticEvent, useEffect, useRef } from "react";
 import { usePlayerControlSocket } from "../../hooks/usePlayerControlSocket";
 
 export function Player() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const dispatch = useAppDispatch();
 
   const source = useAppSelector(selectSource);
   const currentTime = useAppSelector(selectCurrentTime);
@@ -34,11 +37,13 @@ export function Player() {
   const onTimeUpdateHandler = (e: SyntheticEvent<HTMLVideoElement, Event>) => {
     const target = videoRef.current || e.currentTarget;
     const time = target.currentTime;
-    socketControls.seek(time);
+
+    socketControls.timeUpdate(time);
   };
 
   return (
     <div className={styles.videoWrapper}>
+      <h1>Playback state: {playbackState}</h1>
       <video
         autoPlay
         controls
@@ -50,9 +55,11 @@ export function Player() {
           socketControls.seek(videoRef.current?.currentTime || 0);
         }}
         onPause={() => {
+          dispatch(setPlaybackState("paused"));
           socketControls.pause();
         }}
         onPlay={() => {
+          dispatch(setPlaybackState("started"));
           socketControls.play();
         }}
       />

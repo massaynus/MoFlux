@@ -2,6 +2,7 @@ import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
 import {
+  selectPlaybackState,
   selectRoom,
   selectUsername,
   setCurrentTime,
@@ -9,8 +10,15 @@ import {
   setSource,
 } from "../features/player/playerSlice";
 
-const socket = io("http://localhost:7000/", { path: "/ws" });
-const events = ["seek", "changeSource", "pause", "play", "transferOwnership"];
+const socket = io("http://192.168.11.101:7000/", { path: "/ws" });
+const events = [
+  "seek",
+  "changeSource",
+  "pause",
+  "play",
+  "transferOwnership",
+  "timeUpdate",
+];
 
 export function usePlayerControlSocket() {
   const dispatch = useAppDispatch();
@@ -18,6 +26,7 @@ export function usePlayerControlSocket() {
 
   const username = useAppSelector(selectUsername);
   const room = useAppSelector(selectRoom);
+  const playbackState = useAppSelector(selectPlaybackState);
 
   useEffect(() => {
     socket.on("connect", () => setIsConnected(true));
@@ -31,6 +40,10 @@ export function usePlayerControlSocket() {
   }, []);
 
   useEffect(() => {
+    socket.on("timeUpdate", (username, arg) => {
+      playbackState !== "started" && dispatch(setCurrentTime(parseInt(arg)));
+    });
+
     socket.on("seek", (username, arg) => {
       dispatch(setCurrentTime(parseInt(arg)));
       console.log(`user ${username} dispatched a seek to ${arg}`);
@@ -47,12 +60,13 @@ export function usePlayerControlSocket() {
     return () => {
       events.map((event) => socket.off(event));
     };
-  }, [dispatch, room, username]);
+  }, [dispatch, playbackState, room, username]);
 
   useEffect(() => {
     isConnected && socket.emit("credentials", username, room);
   }, [isConnected, room, username]);
 
+  const timeUpdate = (time: number) => socket.emit("timeUpdate", time);
   const seek = (time: number) => socket.emit("seek", time);
   const changeSource = (source: string) => socket.emit("changeSource", source);
   const pause = () => socket.emit("pause");
@@ -63,6 +77,7 @@ export function usePlayerControlSocket() {
   return {
     socket,
     isConnected,
+    timeUpdate,
     seek,
     changeSource,
     transferOwnership,
