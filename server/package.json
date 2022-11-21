@@ -4,7 +4,7 @@
   "description": "",
   "main": "source/index.js",
   "scripts": {
-    "start": "npx nodemon --exec babel-node source/index.js",
+    "start": "nodemon --exec babel-node source/index.js",
     "build": "npx babel ./source --out-dir ./dist --source-maps --copy-files --compact auto --no-comments --verbose --delete-dir-on-start",
     "deploy": "npm run build && node dist/index.js"
   },
@@ -25,7 +25,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.14.5",
+    "@babel/cli": "^7.19.3",
     "@babel/core": "^7.14.6",
     "@babel/plugin-proposal-object-rest-spread": "^7.14.7",
     "@babel/preset-env": "^7.14.7",
@@ -34,6 +34,7 @@
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "nodemon": "^2.0.20",
     "prettier": "2.3.2"
   }
 }
